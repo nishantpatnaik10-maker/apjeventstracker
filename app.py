@@ -90,8 +90,20 @@ THEMES = {
 def get_google_sheets_client():
     """Initialize Google Sheets client."""
     try:
-        # Try to load from Streamlit secrets first (for Streamlit Cloud)
-        if "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
+        import json
+
+        creds = None
+        # Try different secret formats
+        if "GOOGLE_SERVICE_ACCOUNT_JSON_STR" in st.secrets:
+            # If stored as JSON string
+            creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON_STR"])
+            creds = Credentials.from_service_account_info(
+                creds_dict,
+                scopes=['https://www.googleapis.com/auth/spreadsheets',
+                       'https://www.googleapis.com/auth/drive']
+            )
+        elif "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
+            # If stored as TOML object
             creds = Credentials.from_service_account_info(
                 st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"],
                 scopes=['https://www.googleapis.com/auth/spreadsheets',
@@ -106,8 +118,11 @@ def get_google_sheets_client():
                 scopes=['https://www.googleapis.com/auth/spreadsheets',
                        'https://www.googleapis.com/auth/drive']
             )
-        client = gspread.authorize(creds)
-        return client
+
+        if creds:
+            client = gspread.authorize(creds)
+            return client
+        return None
     except Exception as e:
         st.error(f"Error connecting to Google Sheets: {str(e)}")
         return None
