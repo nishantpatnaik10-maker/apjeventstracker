@@ -90,14 +90,22 @@ THEMES = {
 def get_google_sheets_client():
     """Initialize Google Sheets client."""
     try:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        creds_path = os.path.join(script_dir, "credentials.json")
-        
-        creds = Credentials.from_service_account_file(
-            creds_path,
-            scopes=['https://www.googleapis.com/auth/spreadsheets',
-                   'https://www.googleapis.com/auth/drive']
-        )
+        # Try to load from Streamlit secrets first (for Streamlit Cloud)
+        if "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
+            creds = Credentials.from_service_account_info(
+                st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"],
+                scopes=['https://www.googleapis.com/auth/spreadsheets',
+                       'https://www.googleapis.com/auth/drive']
+            )
+        else:
+            # Fallback to local file (for local development)
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            creds_path = os.path.join(script_dir, "credentials.json")
+            creds = Credentials.from_service_account_file(
+                creds_path,
+                scopes=['https://www.googleapis.com/auth/spreadsheets',
+                       'https://www.googleapis.com/auth/drive']
+            )
         client = gspread.authorize(creds)
         return client
     except Exception as e:
