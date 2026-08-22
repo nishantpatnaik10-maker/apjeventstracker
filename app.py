@@ -8,6 +8,10 @@ import os
 import csv
 from io import StringIO
 
+# Clear caches on app reload
+st.cache_data.clear()
+st.cache_resource.clear()
+
 TEAM_MEMBERS = [
     "John Bai",
     "Katherine Chen",
