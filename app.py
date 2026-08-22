@@ -180,6 +180,17 @@ def save_event_to_sheets(event_data, event_type_name):
         st.error("Cannot connect to Google Sheets")
         return False
 
+    # Define column order for each event type
+    COLUMN_ORDER = {
+        "Hands on Experiences": ["name", "description", "id", "date", "sa_id", "assignees", "engagement_app_entry", "created"],
+        "Leaves": ["name", "description", "id", "from_date", "to_date", "created"],
+        "AI Assisted Agentic Development": ["name", "description", "id", "date", "sa_id", "pre_work_done", "assignees", "travel_required", "engagement_app_entry", "created"],
+        "Lunch and Learns": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
+        "Blueprint Workshops": ["name", "description", "id", "date", "workshop_type", "sa_id", "assignees", "engagement_app_entry", "created"],
+        "GTM Onboarding": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
+        "Useful Links": ["title", "link", "created"]
+    }
+
     try:
         sheet_id = st.secrets["GOOGLE_SHEETS_ID"]
         spreadsheet = client.open_by_key(sheet_id)
@@ -189,7 +200,7 @@ def save_event_to_sheets(event_data, event_type_name):
         except gspread.exceptions.WorksheetNotFound:
             worksheet = spreadsheet.add_worksheet(title=event_type_name, rows=100, cols=20)
 
-        headers = list(event_data.keys())
+        headers = COLUMN_ORDER.get(event_type_name, list(event_data.keys()))
         if not worksheet.row_values(1):
             worksheet.insert_row(headers)
 
