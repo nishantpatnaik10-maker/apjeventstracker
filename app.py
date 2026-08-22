@@ -563,6 +563,8 @@ def form_pto():
         if submitted:
             if not (resource_name and description and from_date and to_date and leave_type):
                 st.error("Please fill all mandatory fields")
+            elif to_date < from_date:
+                st.error("❌ To Date must be after From Date")
             else:
                 event_data = {
                     "name": f"{resource_name} - {leave_type}",
@@ -1424,15 +1426,21 @@ def main():
 
         if st.session_state.show_clear_confirmation:
             st.warning("⚠️ Are you sure? This will delete all event data!")
+            password = st.text_input("Enter password to confirm:", type="password", key="clear_password")
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("✅ Confirm Clear", use_container_width=True, key="confirm_clear"):
-                    clear_all_data()
-                    st.session_state.show_clear_confirmation = False
-                    st.rerun()
+                    if password == "RulesDemoXAPJ":
+                        clear_all_data()
+                        st.session_state.show_clear_confirmation = False
+                        st.session_state.clear_password = ""
+                        st.rerun()
+                    else:
+                        st.error("❌ Incorrect password")
             with col2:
                 if st.button("❌ Cancel", use_container_width=True, key="cancel_clear"):
                     st.session_state.show_clear_confirmation = False
+                    st.session_state.clear_password = ""
                     st.rerun()
         else:
             if st.button("🗑️ Clear All Data", use_container_width=True):
