@@ -271,10 +271,10 @@ def render_calendar_month(year, month, theme_colors=None):
 
     event_types_legend = [
         ("🎓 Hands on", EVENT_COLORS["Hands on Experiences"]),
-        ("🏖️ Leaves", EVENT_COLORS["Leaves"]),
+        ("📴 Leaves", EVENT_COLORS["Leaves"]),
         ("🤖 AI Agentic", EVENT_COLORS["AI Assisted Agentic Development"]),
-        ("🍽️ Lunch & Learn", EVENT_COLORS["Lunch and Learns"]),
-        ("🏗️ Workshops", EVENT_COLORS["Blueprint Workshops"]),
+        ("🥗 Lunch & Learn", EVENT_COLORS["Lunch and Learns"]),
+        ("🎪 Workshops", EVENT_COLORS["Blueprint Workshops"]),
         ("🚀 GTM Onboarding", EVENT_COLORS["GTM Onboarding"])
     ]
 
@@ -1099,10 +1099,10 @@ def view_reports(theme_colors=None):
 
     event_types_legend = [
         ("🎓 Hands on", EVENT_COLORS["Hands on Experiences"]),
-        ("🏖️ Leaves", EVENT_COLORS["Leaves"]),
+        ("📴 Leaves", EVENT_COLORS["Leaves"]),
         ("🤖 AI Agentic", EVENT_COLORS["AI Assisted Agentic Development"]),
-        ("🍽️ Lunch & Learn", EVENT_COLORS["Lunch and Learns"]),
-        ("🏗️ Workshops", EVENT_COLORS["Blueprint Workshops"]),
+        ("🥗 Lunch & Learn", EVENT_COLORS["Lunch and Learns"]),
+        ("🎪 Workshops", EVENT_COLORS["Blueprint Workshops"]),
         ("🚀 GTM Onboarding", EVENT_COLORS["GTM Onboarding"])
     ]
 
