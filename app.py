@@ -540,15 +540,6 @@ def form_hands_on_experiences():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Hands on Experiences"):
-                    st.session_state.hands_on_name = ""
-                    st.session_state.hands_on_desc = ""
-                    st.session_state.hands_on_loc = ""
-                    st.session_state.hands_on_sa = ""
-                    st.session_state.hands_on_itsm = ""
-                    st.session_state.hands_on_assets = 0
-                    st.session_state.hands_on_gameboard = ""
-                    st.session_state.hands_on_exp = []
-                    st.session_state.hands_on_assignee = []
                     st.rerun()
 
 def form_pto():
@@ -586,8 +577,6 @@ def form_pto():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Leaves"):
-                    st.session_state.pto_desc = ""
-                    st.session_state.pto_type = "Sick"
                     st.rerun()
 
 def form_ai_agentic():
@@ -626,13 +615,6 @@ def form_ai_agentic():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "AI Assisted Agentic Development"):
-                    st.session_state.ai_name = ""
-                    st.session_state.ai_desc = ""
-                    st.session_state.ai_sa = ""
-                    st.session_state.ai_prework = False
-                    st.session_state.ai_agentic_assignee = []
-                    st.session_state.ai_travel = False
-                    st.session_state.ai_engagement = False
                     st.rerun()
 
 def form_lunch_learn():
@@ -673,14 +655,6 @@ def form_lunch_learn():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Lunch and Learns"):
-                    st.session_state.lunch_name = ""
-                    st.session_state.lunch_desc = ""
-                    st.session_state.lunch_sa = ""
-                    st.session_state.lunch_topic = ""
-                    st.session_state.lunch_link = ""
-                    st.session_state.lunch_learn_assignee = []
-                    st.session_state.lunch_travel = False
-                    st.session_state.lunch_engagement = False
                     st.rerun()
 
 def form_gtm_onboarding():
@@ -721,14 +695,6 @@ def form_gtm_onboarding():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "GTM Onboarding"):
-                    st.session_state.gtm_name = ""
-                    st.session_state.gtm_desc = ""
-                    st.session_state.gtm_sa = ""
-                    st.session_state.gtm_topic = ""
-                    st.session_state.gtm_link = ""
-                    st.session_state.gtm_assignee = []
-                    st.session_state.gtm_travel = False
-                    st.session_state.gtm_engagement = False
                     st.rerun()
 
 def form_blueprint_workshop():
@@ -776,14 +742,6 @@ def form_blueprint_workshop():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Blueprint Workshops"):
-                    st.session_state.bp_name = ""
-                    st.session_state.bp_desc = ""
-                    st.session_state.bp_type = "Workshop"
-                    st.session_state.bp_platform = "Blueprint"
-                    st.session_state.bp_sa = ""
-                    st.session_state.bp_assignee = []
-                    st.session_state.bp_travel = False
-                    st.session_state.bp_engagement = False
                     st.rerun()
 
 def form_useful_links():
@@ -809,9 +767,6 @@ def form_useful_links():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Useful Links"):
-                    st.session_state.useful_title = ""
-                    st.session_state.useful_url = ""
-                    st.session_state.useful_category = ""
                     st.rerun()
 
 def view_events_list():
