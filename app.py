@@ -188,7 +188,7 @@ def save_event_to_sheets(event_data, event_type_name):
         "Lunch and Learns": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
         "Blueprint Workshops": ["name", "description", "id", "date", "workshop_type", "sa_id", "assignees", "engagement_app_entry", "created"],
         "GTM Onboarding": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
-        "Useful Links": ["title", "link", "created"]
+        "Useful Links": ["id", "title", "url", "category", "created"]
     }
 
     try:
