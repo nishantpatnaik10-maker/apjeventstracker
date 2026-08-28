@@ -477,16 +477,16 @@ def form_hands_on_experiences():
     st.subheader("Add Hands on Experiences")
 
     with st.form("hands_on_form"):
-        event_name = st.text_input("Event Name *")
-        description = st.text_area("Description *", height=100)
-        
+        event_name = st.text_input("Event Name *", key="hands_on_name")
+        description = st.text_area("Description *", height=100, key="hands_on_desc")
+
         col1, col2 = st.columns(2)
         with col1:
-            from_date = st.date_input("From Date *")
+            from_date = st.date_input("From Date *", key="hands_on_from")
         with col2:
-            to_date = st.date_input("To Date *")
+            to_date = st.date_input("To Date *", key="hands_on_to")
 
-        location = st.text_input("Location *")
+        location = st.text_input("Location *", key="hands_on_loc")
 
         st.write("Experiences (select all applicable) *")
         experiences = st.multiselect(
@@ -495,11 +495,11 @@ def form_hands_on_experiences():
             key="hands_on_exp"
         )
 
-        sa_id = st.text_input("SA ID")
-        itsm_ticket = st.text_input("ITSM Ticket Number *")
-        num_assets = st.number_input("Number of assets required", min_value=0)
+        sa_id = st.text_input("SA ID", key="hands_on_sa")
+        itsm_ticket = st.text_input("ITSM Ticket Number *", key="hands_on_itsm")
+        num_assets = st.number_input("Number of assets required", min_value=0, key="hands_on_assets")
 
-        gameboard_url = st.text_input("Gameboard URL *")
+        gameboard_url = st.text_input("Gameboard URL *", key="hands_on_gameboard")
 
         st.write("**Calendar Invites (Check all that apply) ***")
         col_invite1, col_invite2 = st.columns(2)
@@ -540,6 +540,15 @@ def form_hands_on_experiences():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Hands on Experiences"):
+                    st.session_state.hands_on_name = ""
+                    st.session_state.hands_on_desc = ""
+                    st.session_state.hands_on_loc = ""
+                    st.session_state.hands_on_sa = ""
+                    st.session_state.hands_on_itsm = ""
+                    st.session_state.hands_on_assets = 0
+                    st.session_state.hands_on_gameboard = ""
+                    st.session_state.hands_on_exp = []
+                    st.session_state.hands_on_assignee = []
                     st.rerun()
 
 def form_pto():
@@ -548,15 +557,15 @@ def form_pto():
 
     with st.form("pto_form"):
         resource_name = st.selectbox("Resource Name *", TEAM_MEMBERS, key="pto_resource")
-        description = st.text_area("Description *", height=100)
-        
+        description = st.text_area("Description *", height=100, key="pto_desc")
+
         col1, col2 = st.columns(2)
         with col1:
             from_date = st.date_input("From Date *", key="pto_from")
         with col2:
             to_date = st.date_input("To Date *", key="pto_to")
 
-        leave_type = st.selectbox("Type of Leave *", ["Sick", "Personal", "Carers", "Bereavement", "Maternity", "Paternity"])
+        leave_type = st.selectbox("Type of Leave *", ["Sick", "Personal", "Carers", "Bereavement", "Maternity", "Paternity"], key="pto_type")
 
         submitted = st.form_submit_button("Save PTO")
 
@@ -577,6 +586,8 @@ def form_pto():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Leaves"):
+                    st.session_state.pto_desc = ""
+                    st.session_state.pto_type = "Sick"
                     st.rerun()
 
 def form_ai_agentic():
@@ -584,15 +595,15 @@ def form_ai_agentic():
     st.subheader("Add AI Assisted Agentic Development Experience")
 
     with st.form("ai_agentic_form"):
-        event_name = st.text_input("Event Name *")
-        description = st.text_area("Description *", height=100)
+        event_name = st.text_input("Event Name *", key="ai_name")
+        description = st.text_area("Description *", height=100, key="ai_desc")
         date = st.date_input("Date *", key="ai_date")
-        sa_id = st.text_input("SA ID *")
-        pre_work = st.checkbox("Pre work done *")
-        
+        sa_id = st.text_input("SA ID *", key="ai_sa")
+        pre_work = st.checkbox("Pre work done *", key="ai_prework")
+
         st.write("**Assignees (Multi-select)**")
         assignees = st.multiselect("Select Assignees", TEAM_MEMBERS, key="ai_agentic_assignee")
-        
+
         travel = st.checkbox("Travel Required", key="ai_travel")
         engagement_app = st.checkbox("Create entry in Engagement App", key="ai_engagement")
 
@@ -615,6 +626,13 @@ def form_ai_agentic():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "AI Assisted Agentic Development"):
+                    st.session_state.ai_name = ""
+                    st.session_state.ai_desc = ""
+                    st.session_state.ai_sa = ""
+                    st.session_state.ai_prework = False
+                    st.session_state.ai_agentic_assignee = []
+                    st.session_state.ai_travel = False
+                    st.session_state.ai_engagement = False
                     st.rerun()
 
 def form_lunch_learn():
@@ -622,16 +640,16 @@ def form_lunch_learn():
     st.subheader("Add Lunch and Learn")
 
     with st.form("lunch_learn_form"):
-        event_name = st.text_input("Event Name *")
-        description = st.text_area("Description *", height=100)
+        event_name = st.text_input("Event Name *", key="lunch_name")
+        description = st.text_area("Description *", height=100, key="lunch_desc")
         date = st.date_input("Date *", key="lunch_date")
-        sa_id = st.text_input("SA ID *")
-        topic = st.text_input("Topic *")
-        useful_link = st.text_input("Useful links")
-        
+        sa_id = st.text_input("SA ID *", key="lunch_sa")
+        topic = st.text_input("Topic *", key="lunch_topic")
+        useful_link = st.text_input("Useful links", key="lunch_link")
+
         st.write("**Assignees (Multi-select)**")
         assignees = st.multiselect("Select Assignees", TEAM_MEMBERS, key="lunch_learn_assignee")
-        
+
         travel = st.checkbox("Travel Required", key="lunch_travel")
         engagement_app = st.checkbox("Create entry in Engagement App", key="lunch_engagement")
 
@@ -655,6 +673,14 @@ def form_lunch_learn():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Lunch and Learns"):
+                    st.session_state.lunch_name = ""
+                    st.session_state.lunch_desc = ""
+                    st.session_state.lunch_sa = ""
+                    st.session_state.lunch_topic = ""
+                    st.session_state.lunch_link = ""
+                    st.session_state.lunch_learn_assignee = []
+                    st.session_state.lunch_travel = False
+                    st.session_state.lunch_engagement = False
                     st.rerun()
 
 def form_gtm_onboarding():
@@ -662,12 +688,12 @@ def form_gtm_onboarding():
     st.subheader("Add GTM Onboarding")
 
     with st.form("gtm_onboarding_form"):
-        event_name = st.text_input("Event Name *")
-        description = st.text_area("Description *", height=100)
+        event_name = st.text_input("Event Name *", key="gtm_name")
+        description = st.text_area("Description *", height=100, key="gtm_desc")
         date = st.date_input("Date *", key="gtm_date")
-        sa_id = st.text_input("SA ID *")
-        topic = st.text_input("Topic *")
-        useful_link = st.text_input("Useful links")
+        sa_id = st.text_input("SA ID *", key="gtm_sa")
+        topic = st.text_input("Topic *", key="gtm_topic")
+        useful_link = st.text_input("Useful links", key="gtm_link")
 
         st.write("**Assignees (Multi-select)**")
         assignees = st.multiselect("Select Assignees", TEAM_MEMBERS, key="gtm_assignee")
@@ -695,6 +721,14 @@ def form_gtm_onboarding():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "GTM Onboarding"):
+                    st.session_state.gtm_name = ""
+                    st.session_state.gtm_desc = ""
+                    st.session_state.gtm_sa = ""
+                    st.session_state.gtm_topic = ""
+                    st.session_state.gtm_link = ""
+                    st.session_state.gtm_assignee = []
+                    st.session_state.gtm_travel = False
+                    st.session_state.gtm_engagement = False
                     st.rerun()
 
 def form_blueprint_workshop():
@@ -702,9 +736,9 @@ def form_blueprint_workshop():
     st.subheader("Add Blueprint Workshop")
 
     with st.form("blueprint_form"):
-        event_name = st.text_input("Event Name *")
-        description = st.text_area("Description *", height=100)
-        workshop_name = st.selectbox("Workshop or Hackathon Type *", ["Workshop", "Hackathon"])
+        event_name = st.text_input("Event Name *", key="bp_name")
+        description = st.text_area("Description *", height=100, key="bp_desc")
+        workshop_name = st.selectbox("Workshop or Hackathon Type *", ["Workshop", "Hackathon"], key="bp_type")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -712,12 +746,12 @@ def form_blueprint_workshop():
         with col2:
             to_date = st.date_input("To Date *", key="bp_to")
 
-        platform = st.selectbox("Platform *", ["Blueprint", "1:1 CE Blueprint"])
-        sa_id = st.text_input("SA ID *")
+        platform = st.selectbox("Platform *", ["Blueprint", "1:1 CE Blueprint"], key="bp_platform")
+        sa_id = st.text_input("SA ID *", key="bp_sa")
 
         st.write("**Assignees (Multi-select)**")
         assignees = st.multiselect("Select Assignees", TEAM_MEMBERS, key="bp_assignee")
-        
+
         travel = st.checkbox("Travel Required", key="bp_travel")
         engagement_app = st.checkbox("Create entry in Engagement App", key="bp_engagement")
 
@@ -742,6 +776,14 @@ def form_blueprint_workshop():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Blueprint Workshops"):
+                    st.session_state.bp_name = ""
+                    st.session_state.bp_desc = ""
+                    st.session_state.bp_type = "Workshop"
+                    st.session_state.bp_platform = "Blueprint"
+                    st.session_state.bp_sa = ""
+                    st.session_state.bp_assignee = []
+                    st.session_state.bp_travel = False
+                    st.session_state.bp_engagement = False
                     st.rerun()
 
 def form_useful_links():
@@ -749,9 +791,9 @@ def form_useful_links():
     st.subheader("Add Useful Link")
 
     with st.form("useful_links_form"):
-        title = st.text_input("Link Title *")
-        url = st.text_input("URL *")
-        category = st.text_input("Category")
+        title = st.text_input("Link Title *", key="useful_title")
+        url = st.text_input("URL *", key="useful_url")
+        category = st.text_input("Category", key="useful_category")
 
         submitted = st.form_submit_button("Save Link")
 
@@ -767,6 +809,9 @@ def form_useful_links():
                     "created": datetime.now().strftime("%Y-%m-%d %H:%M")
                 }
                 if save_event_to_sheets(event_data, "Useful Links"):
+                    st.session_state.useful_title = ""
+                    st.session_state.useful_url = ""
+                    st.session_state.useful_category = ""
                     st.rerun()
 
 def view_events_list():
