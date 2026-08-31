@@ -186,7 +186,7 @@ def save_event_to_sheets(event_data, event_type_name):
         "Leaves": ["name", "description", "id", "from_date", "to_date", "created"],
         "AI Assisted Agentic Development": ["name", "description", "id", "date", "sa_id", "pre_work_done", "assignees", "travel_required", "engagement_app_entry", "created"],
         "Lunch and Learns": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
-        "Blueprint Workshops": ["name", "description", "id", "date", "workshop_type", "sa_id", "assignees", "engagement_app_entry", "created"],
+        "Blueprint Workshops": ["name", "description", "id", "workshop_type", "from_date", "to_date", "platform", "sa_id", "assignees", "travel_required", "engagement_app_entry", "created"],
         "GTM Onboarding": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
         "Useful Links": ["id", "title", "url", "category", "created"]
     }
@@ -725,7 +725,7 @@ def form_blueprint_workshop():
                     "name": event_name,
                     "description": description,
                     "id": f"blueprint_{datetime.now().timestamp()}",
-                    "workshop_name": workshop_name,
+                    "workshop_type": workshop_name,
                     "from_date": from_date.strftime("%Y-%m-%d"),
                     "to_date": to_date.strftime("%Y-%m-%d"),
                     "platform": platform,
