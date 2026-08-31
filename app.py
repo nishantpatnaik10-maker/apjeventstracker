@@ -1209,9 +1209,12 @@ def view_reports(theme_colors=None):
         if event_date and event_date.year == report_year:
             year_events.append(event)
 
-    # Count events by month
-    monthly_counts = {i: 0 for i in range(1, 13)}
+    # Count events by month and event type
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    monthly_by_type = {}
+
     for event in year_events:
+        event_type = event.get('event_type', 'Unknown')
         event_date = None
         if 'date' in event and pd.notna(event['date']):
             try:
@@ -1224,20 +1227,31 @@ def view_reports(theme_colors=None):
             except:
                 pass
         if event_date:
-            monthly_counts[event_date.month] += 1
+            month = event_date.month
+            if month not in monthly_by_type:
+                monthly_by_type[month] = {}
+            monthly_by_type[month][event_type] = monthly_by_type[month].get(event_type, 0) + 1
 
-    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    fig_month = go.Figure(data=[
-        go.Bar(
+    # Get all event types
+    all_event_types = sorted(set(e.get('event_type', 'Unknown') for e in year_events))
+
+    # Create stacked bar chart
+    fig_month = go.Figure()
+
+    for event_type in all_event_types:
+        values = [monthly_by_type.get(month, {}).get(event_type, 0) for month in range(1, 13)]
+        fig_month.add_trace(go.Bar(
             x=month_names,
-            y=[monthly_counts[i] for i in range(1, 13)],
-            marker_color=theme_colors.get('primary', '#0066cc')
-        )
-    ])
+            y=values,
+            name=event_type,
+            marker_color=EVENT_COLORS.get(event_type, "#808080")
+        ))
+
     fig_month.update_layout(
-        title=f"Events by Month - {report_year}",
+        title=f"Events by Month - {report_year} (By Type)",
         xaxis_title="Month",
         yaxis_title="Number of Events",
+        barmode='stack',
         height=400
     )
     st.plotly_chart(fig_month, use_container_width=True)
@@ -1245,10 +1259,11 @@ def view_reports(theme_colors=None):
     # CSV export for monthly data
     col1, col2 = st.columns([3, 1])
     with col2:
-        monthly_df = pd.DataFrame({
-            "Month": month_names,
-            "Events": [monthly_counts[i] for i in range(1, 13)]
-        })
+        monthly_export = {"Month": month_names}
+        for event_type in all_event_types:
+            monthly_export[event_type] = [monthly_by_type.get(month, {}).get(event_type, 0) for month in range(1, 13)]
+
+        monthly_df = pd.DataFrame(monthly_export)
         csv_monthly = monthly_df.to_csv(index=False)
         st.download_button(
             label="📥 Download Monthly CSV",
@@ -1262,9 +1277,10 @@ def view_reports(theme_colors=None):
     # 5. Events by Quarter (Excluding Leaves)
     st.subheader("📊 Events by Quarter (Excluding Leaves)")
 
-    # Count events by quarter
-    quarterly_counts = {1: 0, 2: 0, 3: 0, 4: 0}
+    # Count events by quarter and event type
+    quarterly_by_type = {}
     for event in year_events:
+        event_type = event.get('event_type', 'Unknown')
         event_date = None
         if 'date' in event and pd.notna(event['date']):
             try:
@@ -1278,20 +1294,29 @@ def view_reports(theme_colors=None):
                 pass
         if event_date:
             quarter = (event_date.month - 1) // 3 + 1
-            quarterly_counts[quarter] += 1
+            if quarter not in quarterly_by_type:
+                quarterly_by_type[quarter] = {}
+            quarterly_by_type[quarter][event_type] = quarterly_by_type[quarter].get(event_type, 0) + 1
 
     quarters = ["Q1", "Q2", "Q3", "Q4"]
-    fig_quarter = go.Figure(data=[
-        go.Bar(
+
+    # Create stacked bar chart for quarters
+    fig_quarter = go.Figure()
+
+    for event_type in all_event_types:
+        values = [quarterly_by_type.get(q, {}).get(event_type, 0) for q in range(1, 5)]
+        fig_quarter.add_trace(go.Bar(
             x=quarters,
-            y=[quarterly_counts[i] for i in range(1, 5)],
-            marker_color=theme_colors.get('accent', '#ff6b6b')
-        )
-    ])
+            y=values,
+            name=event_type,
+            marker_color=EVENT_COLORS.get(event_type, "#808080")
+        ))
+
     fig_quarter.update_layout(
-        title=f"Events by Quarter - {report_year}",
+        title=f"Events by Quarter - {report_year} (By Type)",
         xaxis_title="Quarter",
         yaxis_title="Number of Events",
+        barmode='stack',
         height=400
     )
     st.plotly_chart(fig_quarter, use_container_width=True)
@@ -1299,10 +1324,11 @@ def view_reports(theme_colors=None):
     # CSV export for quarterly data
     col1, col2 = st.columns([3, 1])
     with col2:
-        quarterly_df = pd.DataFrame({
-            "Quarter": quarters,
-            "Events": [quarterly_counts[i] for i in range(1, 5)]
-        })
+        quarterly_export = {"Quarter": quarters}
+        for event_type in all_event_types:
+            quarterly_export[event_type] = [quarterly_by_type.get(q, {}).get(event_type, 0) for q in range(1, 5)]
+
+        quarterly_df = pd.DataFrame(quarterly_export)
         csv_quarterly = quarterly_df.to_csv(index=False)
         st.download_button(
             label="📥 Download Quarterly CSV",
