@@ -182,7 +182,7 @@ def save_event_to_sheets(event_data, event_type_name):
 
     # Define column order for each event type
     COLUMN_ORDER = {
-        "Hands on Experiences": ["name", "description", "id", "date", "sa_id", "assignees", "engagement_app_entry", "created"],
+        "Hands on Experiences": ["name", "description", "id", "date", "location", "experiences", "sa_id", "itsm_ticket", "num_assets", "gameboard_url", "invite_demox", "invite_demoexperiences", "assignees", "travel_required", "engagement_app_entry", "created"],
         "Leaves": ["name", "description", "id", "from_date", "to_date", "created"],
         "AI Assisted Agentic Development": ["name", "description", "id", "date", "sa_id", "pre_work_done", "assignees", "travel_required", "engagement_app_entry", "created"],
         "Lunch and Learns": ["name", "description", "id", "date", "sa_id", "topic", "useful_link", "assignees", "travel_required", "engagement_app_entry", "created"],
@@ -480,12 +480,7 @@ def form_hands_on_experiences():
         event_name = st.text_input("Event Name *", key="hands_on_name")
         description = st.text_area("Description *", height=100, key="hands_on_desc")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            from_date = st.date_input("From Date *", key="hands_on_from")
-        with col2:
-            to_date = st.date_input("To Date *", key="hands_on_to")
-
+        date = st.date_input("Date *", key="hands_on_date")
         location = st.text_input("Location *", key="hands_on_loc")
 
         st.write("Experiences (select all applicable) *")
@@ -517,15 +512,14 @@ def form_hands_on_experiences():
         submitted = st.form_submit_button("Save Event")
 
         if submitted:
-            if not (event_name and description and from_date and to_date and location and experiences and itsm_ticket and assignees and gameboard_url and invite_demox and invite_demoexp):
+            if not (event_name and description and date and location and experiences and itsm_ticket and assignees and gameboard_url and invite_demox and invite_demoexp):
                 st.error("Please fill all mandatory fields")
             else:
                 event_data = {
                     "name": event_name,
                     "description": description,
                     "id": f"hands_on_{datetime.now().timestamp()}",
-                    "from_date": from_date.strftime("%Y-%m-%d"),
-                    "to_date": to_date.strftime("%Y-%m-%d"),
+                    "date": date.strftime("%Y-%m-%d"),
                     "location": location,
                     "experiences": ", ".join(experiences),
                     "sa_id": sa_id,
