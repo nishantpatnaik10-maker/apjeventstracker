@@ -784,10 +784,10 @@ def view_events_list():
 
         for idx, row in filtered_df.iterrows():
             event_type = row.get('event_type', 'Unknown')
-            description = row.get('description', 'No description')[:100]
+            event_name = row.get('name', 'Unnamed Event')[:100]
             emoji = EVENT_EMOJIS.get(event_type, "📌")
-            
-            with st.expander(f"{emoji} {description}..."):
+
+            with st.expander(f"{emoji} {event_name}..."):
                 col1, col2 = st.columns([4, 1])
 
                 with col1:
@@ -1181,6 +1181,135 @@ def view_reports(theme_colors=None):
                         <div style='margin-top: 5px; color: {text_color}; text-shadow: 0 1px 2px rgba(0,0,0,0.2);'>{assignee_text if assignee_text else "-"}</div>
                     </div>
                     """, unsafe_allow_html=True)
+
+    st.divider()
+
+    # 4. Events by Month (Excluding Leaves)
+    st.subheader("📅 Events by Month (Excluding Leaves)")
+
+    import plotly.graph_objects as go
+
+    # Get all events for the year, excluding leaves
+    year_events = []
+    for idx, event in events_df.iterrows():
+        if event.get('event_type') == 'Leaves':
+            continue
+        event_date = None
+        if 'date' in event and pd.notna(event['date']):
+            try:
+                event_date = pd.to_datetime(event['date'])
+            except:
+                pass
+        elif 'from_date' in event and pd.notna(event['from_date']):
+            try:
+                event_date = pd.to_datetime(event['from_date'])
+            except:
+                pass
+
+        if event_date and event_date.year == report_year:
+            year_events.append(event)
+
+    # Count events by month
+    monthly_counts = {i: 0 for i in range(1, 13)}
+    for event in year_events:
+        event_date = None
+        if 'date' in event and pd.notna(event['date']):
+            try:
+                event_date = pd.to_datetime(event['date'])
+            except:
+                pass
+        elif 'from_date' in event and pd.notna(event['from_date']):
+            try:
+                event_date = pd.to_datetime(event['from_date'])
+            except:
+                pass
+        if event_date:
+            monthly_counts[event_date.month] += 1
+
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    fig_month = go.Figure(data=[
+        go.Bar(
+            x=month_names,
+            y=[monthly_counts[i] for i in range(1, 13)],
+            marker_color=theme_colors.get('primary', '#0066cc')
+        )
+    ])
+    fig_month.update_layout(
+        title=f"Events by Month - {report_year}",
+        xaxis_title="Month",
+        yaxis_title="Number of Events",
+        height=400
+    )
+    st.plotly_chart(fig_month, use_container_width=True)
+
+    # CSV export for monthly data
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        monthly_df = pd.DataFrame({
+            "Month": month_names,
+            "Events": [monthly_counts[i] for i in range(1, 13)]
+        })
+        csv_monthly = monthly_df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download Monthly CSV",
+            data=csv_monthly,
+            file_name=f"events_by_month_{report_year}.csv",
+            mime="text/csv"
+        )
+
+    st.divider()
+
+    # 5. Events by Quarter (Excluding Leaves)
+    st.subheader("📊 Events by Quarter (Excluding Leaves)")
+
+    # Count events by quarter
+    quarterly_counts = {1: 0, 2: 0, 3: 0, 4: 0}
+    for event in year_events:
+        event_date = None
+        if 'date' in event and pd.notna(event['date']):
+            try:
+                event_date = pd.to_datetime(event['date'])
+            except:
+                pass
+        elif 'from_date' in event and pd.notna(event['from_date']):
+            try:
+                event_date = pd.to_datetime(event['from_date'])
+            except:
+                pass
+        if event_date:
+            quarter = (event_date.month - 1) // 3 + 1
+            quarterly_counts[quarter] += 1
+
+    quarters = ["Q1", "Q2", "Q3", "Q4"]
+    fig_quarter = go.Figure(data=[
+        go.Bar(
+            x=quarters,
+            y=[quarterly_counts[i] for i in range(1, 5)],
+            marker_color=theme_colors.get('accent', '#ff6b6b')
+        )
+    ])
+    fig_quarter.update_layout(
+        title=f"Events by Quarter - {report_year}",
+        xaxis_title="Quarter",
+        yaxis_title="Number of Events",
+        height=400
+    )
+    st.plotly_chart(fig_quarter, use_container_width=True)
+
+    # CSV export for quarterly data
+    col1, col2 = st.columns([3, 1])
+    with col2:
+        quarterly_df = pd.DataFrame({
+            "Quarter": quarters,
+            "Events": [quarterly_counts[i] for i in range(1, 5)]
+        })
+        csv_quarterly = quarterly_df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download Quarterly CSV",
+            data=csv_quarterly,
+            file_name=f"events_by_quarter_{report_year}.csv",
+            mime="text/csv"
+        )
 
 def export_events_to_csv(events_df, filename="events.csv"):
     """Convert events dataframe to CSV string."""
