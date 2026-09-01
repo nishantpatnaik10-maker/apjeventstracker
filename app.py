@@ -1671,20 +1671,23 @@ def main():
 
             if not links_df.empty:
                 for idx, link in links_df.iterrows():
-                    with st.container():
-                        col1, col2 = st.columns([4, 1])
-                        with col1:
-                            title = link.get('title', 'Untitled Link')
-                            url = link.get('url', '#')
-                            st.markdown(f"### [{title}]({url})")
-                            if link.get('category'):
-                                st.caption(f"📁 Category: {link['category']}")
-                            st.caption(f"🔗 {url}")
-                        with col2:
-                            if st.button("🗑️", key=f"delete_link_{idx}"):
-                                delete_event_from_sheets("Useful Links", link.get('id', ''))
-                                st.rerun()
-                        st.divider()
+                    title = link.get('title', 'Untitled Link')
+                    url = link.get('url', '#')
+                    category = link.get('category', '')
+
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"""
+                        <div style='margin: 15px 0;'>
+                            <a href='{url}' target='_blank' style='font-size: 18px; font-weight: 600; color: #0066cc; text-decoration: none; line-height: 1.4;'>{title}</a>
+                            {f"<div style='font-size: 13px; color: #666; margin-top: 6px;'>📁 {category}</div>" if category else ""}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    with col2:
+                        if st.button("🗑️", key=f"delete_link_{idx}"):
+                            delete_event_from_sheets("Useful Links", link.get('id', ''))
+                            st.rerun()
+                    st.divider()
             else:
                 st.info("No useful links yet.")
 
