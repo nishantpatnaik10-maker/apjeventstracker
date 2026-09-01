@@ -1185,7 +1185,7 @@ def view_reports(theme_colors=None):
     st.divider()
 
     # 4. Events by Month (Excluding Leaves)
-    st.subheader("📅 Events by Month (Excluding Leaves)")
+    st.subheader("📅 Events by Month")
 
     import plotly.graph_objects as go
 
@@ -1275,7 +1275,7 @@ def view_reports(theme_colors=None):
     st.divider()
 
     # 5. Events by Quarter (Excluding Leaves)
-    st.subheader("📊 Events by Quarter (Excluding Leaves)")
+    st.subheader("📊 Events by Quarter")
 
     # Count events by quarter and event type
     quarterly_by_type = {}
