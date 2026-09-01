@@ -240,29 +240,32 @@ def get_events_for_date(date_str, events_df):
     """Get all events for a specific date."""
     if events_df.empty:
         return pd.DataFrame()
-    
+
+    events_df = events_df.reset_index(drop=True)
     date_events = []
-    
+
     for idx, row in events_df.iterrows():
         if 'from_date' in row and 'to_date' in row:
             try:
                 from_date = pd.to_datetime(row['from_date'], errors='coerce')
                 to_date = pd.to_datetime(row['to_date'], errors='coerce')
                 check_date = pd.to_datetime(date_str, errors='coerce')
-                
+
                 if from_date <= check_date <= to_date:
                     date_events.append(idx)
             except:
                 pass
-        
+
         if 'date' in row:
             try:
                 if pd.to_datetime(row['date'], errors='coerce').strftime('%Y-%m-%d') == date_str:
                     date_events.append(idx)
             except:
                 pass
-    
-    return events_df.iloc[date_events]
+
+    if date_events:
+        return events_df.iloc[date_events]
+    return pd.DataFrame()
 
 def render_calendar_month(year, month, theme_colors=None):
     """Render month view calendar with clickable dates and color coding."""
