@@ -1242,26 +1242,33 @@ def view_reports(theme_colors=None):
     # Get all event types
     all_event_types = sorted(set(e.get('event_type', 'Unknown') for e in year_events))
 
-    # Create stacked bar chart
-    fig_month = go.Figure()
+    # Create pie chart for monthly data by type
+    total_by_type = {}
+    for month_data in monthly_by_type.values():
+        for event_type, count in month_data.items():
+            total_by_type[event_type] = total_by_type.get(event_type, 0) + count
 
-    for event_type in all_event_types:
-        values = [monthly_by_type.get(month, {}).get(event_type, 0) for month in range(1, 13)]
-        fig_month.add_trace(go.Bar(
-            x=month_names,
-            y=values,
-            name=event_type,
-            marker_color=EVENT_COLORS.get(event_type, "#808080")
-        ))
+    if total_by_type:
+        labels = list(total_by_type.keys())
+        values = list(total_by_type.values())
+        colors = [EVENT_COLORS.get(label, "#808080") for label in labels]
 
-    fig_month.update_layout(
-        title=f"Events by Month - {report_year} (By Type)",
-        xaxis_title="Month",
-        yaxis_title="Number of Events",
-        barmode='stack',
-        height=400
-    )
-    st.plotly_chart(fig_month, use_container_width=True)
+        fig_month = go.Figure(data=[
+            go.Pie(
+                labels=labels,
+                values=values,
+                marker=dict(colors=colors),
+                textposition='inside',
+                textinfo='label+percent'
+            )
+        ])
+        fig_month.update_layout(
+            title=f"Events by Type - {report_year}",
+            height=450
+        )
+        st.plotly_chart(fig_month, use_container_width=True)
+    else:
+        st.info("No events found for the selected year.")
 
     # CSV export for monthly data
     col1, col2 = st.columns([3, 1])
@@ -1307,26 +1314,33 @@ def view_reports(theme_colors=None):
 
     quarters = ["Q1", "Q2", "Q3", "Q4"]
 
-    # Create stacked bar chart for quarters
-    fig_quarter = go.Figure()
+    # Create pie chart for quarterly data by type
+    total_quarter_by_type = {}
+    for quarter_data in quarterly_by_type.values():
+        for event_type, count in quarter_data.items():
+            total_quarter_by_type[event_type] = total_quarter_by_type.get(event_type, 0) + count
 
-    for event_type in all_event_types:
-        values = [quarterly_by_type.get(q, {}).get(event_type, 0) for q in range(1, 5)]
-        fig_quarter.add_trace(go.Bar(
-            x=quarters,
-            y=values,
-            name=event_type,
-            marker_color=EVENT_COLORS.get(event_type, "#808080")
-        ))
+    if total_quarter_by_type:
+        q_labels = list(total_quarter_by_type.keys())
+        q_values = list(total_quarter_by_type.values())
+        q_colors = [EVENT_COLORS.get(label, "#808080") for label in q_labels]
 
-    fig_quarter.update_layout(
-        title=f"Events by Quarter - {report_year} (By Type)",
-        xaxis_title="Quarter",
-        yaxis_title="Number of Events",
-        barmode='stack',
-        height=400
-    )
-    st.plotly_chart(fig_quarter, use_container_width=True)
+        fig_quarter = go.Figure(data=[
+            go.Pie(
+                labels=q_labels,
+                values=q_values,
+                marker=dict(colors=q_colors),
+                textposition='inside',
+                textinfo='label+percent'
+            )
+        ])
+        fig_quarter.update_layout(
+            title=f"Events by Type (Quarterly View) - {report_year}",
+            height=450
+        )
+        st.plotly_chart(fig_quarter, use_container_width=True)
+    else:
+        st.info("No events found for the selected year.")
 
     # CSV export for quarterly data
     col1, col2 = st.columns([3, 1])
