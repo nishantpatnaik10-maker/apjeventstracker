@@ -743,14 +743,18 @@ def form_blueprint_workshop():
 
 def form_useful_links():
     """Form for Useful Links."""
-    st.subheader("Add Useful Link")
-
     with st.form("useful_links_form"):
-        title = st.text_input("Link Title *", key="useful_title")
-        url = st.text_input("URL *", key="useful_url")
-        category = st.text_input("Category", key="useful_category")
+        st.markdown("**Link Title** <span style='color:red'>*</span>", unsafe_allow_html=True)
+        title = st.text_input("", placeholder="Enter link title", key="useful_title", label_visibility="collapsed")
 
-        submitted = st.form_submit_button("Save Link")
+        st.markdown("**URL** <span style='color:red'>*</span>", unsafe_allow_html=True)
+        url = st.text_input("", placeholder="https://example.com", key="useful_url", label_visibility="collapsed")
+
+        st.markdown("**Category**")
+        category = st.text_input("", placeholder="e.g., Demo Assets, Templates, etc.", key="useful_category", label_visibility="collapsed")
+
+        st.markdown("")
+        submitted = st.form_submit_button("➕ Save Link", use_container_width=True)
 
         if submitted:
             if not (title and url):
