@@ -21,10 +21,20 @@ def get_google_sheets_client():
     """Initialize Google Sheets client."""
     creds_dict = None
 
-    # Try environment variable first (for Render/cloud deployments)
+    # Try environment variable first (for cloud deployments)
     if os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON_STR'):
         try:
             creds_dict = json.loads(os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON_STR'))
+            print("✓ Loaded credentials from GOOGLE_SERVICE_ACCOUNT_JSON_STR")
+        except Exception as e:
+            print(f"Error parsing GOOGLE_SERVICE_ACCOUNT_JSON_STR: {e}")
+
+    # Try Render secret file path
+    if not creds_dict:
+        try:
+            with open('/etc/render/credentials.json') as f:
+                creds_dict = json.load(f)
+                print("✓ Loaded credentials from /etc/render/credentials.json")
         except:
             pass
 
@@ -34,16 +44,18 @@ def get_google_sheets_client():
             import streamlit as st
             if "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
                 creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"])
+                print("✓ Loaded credentials from Streamlit secrets")
         except:
             pass
 
-    # Fall back to credentials.json file
+    # Fall back to local credentials.json file
     if not creds_dict:
         try:
             with open('credentials.json') as f:
                 creds_dict = json.load(f)
+                print("✓ Loaded credentials from credentials.json")
         except Exception as e:
-            print(f"Error loading credentials: {e}")
+            print(f"✗ Error loading credentials: {e}")
             return None
 
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
@@ -54,9 +66,13 @@ def fetch_events_from_sheets():
     """Fetch all events from Google Sheets, excluding Leaves."""
     try:
         client = get_google_sheets_client()
+        if not client:
+            print("✗ Failed to initialize Google Sheets client")
+            return []
 
         # Your Google Sheets ID from the app
         sheet_id = os.getenv('GOOGLE_SHEETS_ID', '1wpJSSYoHKKtzVN1e4X4b9pnrTNkVM0rMGBJubGh6xhk')
+        print(f"Fetching events from sheet: {sheet_id}")
         spreadsheet = client.open_by_key(sheet_id)
 
         events = []
