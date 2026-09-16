@@ -19,19 +19,32 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapi
 
 def get_google_sheets_client():
     """Initialize Google Sheets client."""
-    try:
-        # Try to load from Streamlit secrets first (if running in Streamlit environment)
-        import streamlit as st
-        if "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
-            creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"])
-        else:
-            # Fall back to credentials.json file
+    creds_dict = None
+
+    # Try environment variable first (for Render/cloud deployments)
+    if os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON_STR'):
+        try:
+            creds_dict = json.loads(os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON_STR'))
+        except:
+            pass
+
+    # Try Streamlit secrets (if running in Streamlit environment)
+    if not creds_dict:
+        try:
+            import streamlit as st
+            if "GOOGLE_SERVICE_ACCOUNT_JSON" in st.secrets:
+                creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"])
+        except:
+            pass
+
+    # Fall back to credentials.json file
+    if not creds_dict:
+        try:
             with open('credentials.json') as f:
                 creds_dict = json.load(f)
-    except:
-        # Fall back to credentials.json file
-        with open('credentials.json') as f:
-            creds_dict = json.load(f)
+        except Exception as e:
+            print(f"Error loading credentials: {e}")
+            return None
 
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     client = gspread.authorize(creds)
