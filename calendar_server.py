@@ -79,12 +79,15 @@ def fetch_events_from_sheets():
         event_id = 1
 
         # Get all worksheets except Leaves
+        print(f"Reading worksheets...")
         for worksheet in spreadsheet.worksheets():
             if worksheet.title == "Leaves" or worksheet.title == "Useful Links":
+                print(f"  Skipping {worksheet.title}")
                 continue
 
             try:
                 data = worksheet.get_all_records()
+                print(f"  {worksheet.title}: {len(data)} records")
                 for record in data:
                     # Get the date field - could be 'date', 'from_date', or 'to_date'
                     event_date = None
@@ -108,8 +111,11 @@ def fetch_events_from_sheets():
                         event_id += 1
             except Exception as e:
                 print(f"Error reading worksheet {worksheet.title}: {e}")
+                import traceback
+                traceback.print_exc()
                 continue
 
+        print(f"✓ Total events fetched: {len(events)}")
         return events
     except Exception as e:
         print(f"Error fetching from Google Sheets: {e}")
@@ -731,6 +737,17 @@ def get_events():
     """API endpoint to fetch events from Google Sheets."""
     events = fetch_events_from_sheets()
     return jsonify(events)
+
+@app.route('/api/debug')
+def debug_info():
+    """Debug endpoint to check configuration."""
+    return jsonify({
+        'google_sheets_id_set': bool(os.getenv('GOOGLE_SHEETS_ID')),
+        'google_creds_env_var_set': bool(os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON_STR')),
+        'credentials_file_exists': os.path.exists('credentials.json'),
+        'render_creds_file_exists': os.path.exists('/etc/render/credentials.json'),
+        'sheet_id': os.getenv('GOOGLE_SHEETS_ID', '1wpJSSYoHKKtzVN1e4X4b9pnrTNkVM0rMGBJubGh6xhk')
+    })
 
 if __name__ == '__main__':
     print("Starting APJ DemoX Events Calendar Server...")
