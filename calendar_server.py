@@ -705,5 +705,6 @@ def get_events():
 
 if __name__ == '__main__':
     print("Starting APJ DemoX Events Calendar Server...")
-    print("Open http://localhost:5000 in your browser")
-    app.run(debug=True, port=5000)
+    port = int(os.getenv('PORT', 5000))
+    print(f"Open http://0.0.0.0:{port} in your browser")
+    app.run(host='0.0.0.0', port=port, debug=False)
