@@ -102,6 +102,7 @@ def fetch_events_from_sheets():
                             'title': record.get('name', 'Unnamed Event'),
                             'type': worksheet.title,
                             'date': event_date,
+                            'end_date': record.get('to_date', event_date),
                             'description': record.get('description', ''),
                             'engagement': record.get('engagement_app_entry', False),
                             'sa_id': record.get('sa_id', ''),

@@ -547,7 +547,11 @@
                         // Current month days
                         dateDiv.textContent = dayCounter;
                         const currentDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayCounter).padStart(2, "0")}`;
-                        const dayEvents = events.filter(e => e.date === currentDateStr);
+                        const dayEvents = events.filter(e => {
+                            const eventStart = e.date;
+                            const eventEnd = e.end_date || e.date;
+                            return currentDateStr >= eventStart && currentDateStr <= eventEnd;
+                        });
 
                         if (dayEvents.length > 0) {
                             const eventsList = document.createElement("div");
@@ -585,7 +589,15 @@
         function showEventDetails(event) {
             document.getElementById("eventTitle").textContent = event.title;
             document.getElementById("eventType").textContent = event.type;
-            document.getElementById("eventDate").textContent = new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+            const startDate = new Date(event.date).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+            const endDate = event.end_date && event.end_date !== event.date
+                ? new Date(event.end_date).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" })
+                : null;
+
+            const dateText = endDate ? `${startDate} - ${endDate}` : startDate;
+            document.getElementById("eventDate").textContent = dateText;
+
             document.getElementById("eventDescription").textContent = event.description;
             document.getElementById("eventEngagement").innerHTML = `<span class="event-badge event-badge-engagement">${event.engagement ? "✓ Yes" : "Not Created"}</span>`;
             document.getElementById("eventSAID").textContent = event.sa_id || "N/A";
