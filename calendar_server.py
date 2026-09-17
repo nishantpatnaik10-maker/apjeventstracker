@@ -645,7 +645,11 @@ HTML_TEMPLATE = '''
                         // Current month days
                         dateDiv.textContent = dayCounter;
                         const currentDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayCounter).padStart(2, "0")}`;
-                        const dayEvents = events.filter(e => e.date.startsWith(currentDateStr));
+                        const dayEvents = events.filter(e => {
+                            const eventStart = e.date;
+                            const eventEnd = e.end_date || e.date;
+                            return currentDateStr >= eventStart && currentDateStr <= eventEnd;
+                        });
 
                         if (dayEvents.length > 0) {
                             const eventsList = document.createElement("div");
@@ -684,9 +688,14 @@ HTML_TEMPLATE = '''
             document.getElementById("eventTitle").textContent = event.title;
             document.getElementById("eventType").textContent = event.type;
 
-            // Parse and format date
-            const eventDate = new Date(event.date + 'T00:00:00');
-            document.getElementById("eventDate").textContent = eventDate.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+            // Parse and format dates - handle date ranges
+            const startDate = new Date(event.date + 'T00:00:00').toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+            const endDate = event.end_date && event.end_date !== event.date
+                ? new Date(event.end_date + 'T00:00:00').toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" })
+                : null;
+
+            const dateText = endDate ? `${startDate} - ${endDate}` : startDate;
+            document.getElementById("eventDate").textContent = dateText;
 
             document.getElementById("eventDescription").textContent = event.description || "No description provided";
 
