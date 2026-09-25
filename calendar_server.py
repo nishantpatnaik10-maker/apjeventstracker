@@ -443,6 +443,26 @@ HTML_TEMPLATE = '''
             color: #666;
         }
 
+        .chart-container {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .chart-container h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-container canvas {
+            max-width: 400px;
+            margin: 0 auto;
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -534,6 +554,11 @@ HTML_TEMPLATE = '''
             <tbody id="calendarBody">
             </tbody>
         </table>
+
+        <div class="chart-container">
+            <h2>📊 Events Analytics</h2>
+            <canvas id="eventsChart"></canvas>
+        </div>
     </div>
 
     <!-- Event Details Modal -->
@@ -597,6 +622,7 @@ HTML_TEMPLATE = '''
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('calendarTable').style.display = 'table';
                 renderCalendar();
+                setTimeout(generateChart, 100);
             } catch (error) {
                 console.error('Error loading events:', error);
                 document.getElementById('loadingMessage').innerHTML = '<span style="color: red;">Error loading events. Please make sure Google Sheets credentials are configured.</span>';
@@ -730,9 +756,88 @@ HTML_TEMPLATE = '''
             }
         });
 
+        // Generate analytics chart
+        function generateChart() {
+            const today = new Date().toISOString().split('T')[0];
+
+            const eventStats = {
+                completed: {},
+                scheduled: {}
+            };
+
+            events.forEach(event => {
+                const eventType = event.type;
+                const eventDate = event.date;
+                const isCompleted = eventDate < today;
+                const category = isCompleted ? 'completed' : 'scheduled';
+
+                if (!eventStats[category][eventType]) {
+                    eventStats[category][eventType] = 0;
+                }
+                eventStats[category][eventType]++;
+            });
+
+            // Prepare data for chart
+            const colors = {
+                'Hands on Experiences': '#FFB6C1',
+                'AI Assisted Agentic Development': '#98FB98',
+                'Lunch and Learns': '#FFD700',
+                'Blueprint Workshops': '#DDA0DD',
+                'GTM Onboarding': '#FFA500'
+            };
+
+            const labels = [];
+            const data = [];
+            const backgroundColor = [];
+
+            // Add completed events
+            Object.entries(eventStats.completed).forEach(([type, count]) => {
+                labels.push(`${type} (Completed)`);
+                data.push(count);
+                backgroundColor.push(colors[type] || '#999');
+            });
+
+            // Add scheduled events
+            Object.entries(eventStats.scheduled).forEach(([type, count]) => {
+                labels.push(`${type} (Scheduled)`);
+                data.push(count);
+                backgroundColor.push(colors[type] || '#999');
+            });
+
+            // Create chart
+            const ctx = document.getElementById('eventsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 12 },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Load events on page load
         loadEvents();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </body>
 </html>
 '''
