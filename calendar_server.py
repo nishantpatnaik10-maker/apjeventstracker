@@ -522,13 +522,13 @@ HTML_TEMPLATE = '''
         <table class="calendar" id="calendarTable" style="display: none;">
             <thead>
                 <tr>
+                    <th>Sun</th>
                     <th>Mon</th>
                     <th>Tue</th>
                     <th>Wed</th>
                     <th>Thu</th>
                     <th>Fri</th>
                     <th>Sat</th>
-                    <th>Sun</th>
                 </tr>
             </thead>
             <tbody id="calendarBody">
