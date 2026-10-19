@@ -150,6 +150,7 @@ HTML_TEMPLATE = '''
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 30px;
+            overflow-x: hidden;
         }
 
         .header {
@@ -233,6 +234,7 @@ HTML_TEMPLATE = '''
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            table-layout: fixed;
         }
 
         .calendar thead {
@@ -282,6 +284,8 @@ HTML_TEMPLATE = '''
             display: flex;
             flex-direction: column;
             gap: 4px;
+            overflow: hidden;
+            width: 100%;
         }
 
         .event {
