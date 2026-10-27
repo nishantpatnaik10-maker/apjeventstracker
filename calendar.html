@@ -680,58 +680,31 @@
                 eventStats[category][eventType]++;
             });
 
-            // Prepare data for chart
-            const colors = {
-                'Hands on Experiences': '#FFB6C1',
-                'AI Assisted Agentic Development': '#98FB98',
-                'Lunch and Learns': '#FFD700',
-                'Blueprint Workshops': '#DDA0DD',
-                'GTM Onboarding': '#FFA500'
-            };
-
-            const labels = [];
-            const data = [];
-            const backgroundColor = [];
-
-            // Add completed events
-            Object.entries(eventStats.completed).forEach(([type, count]) => {
-                labels.push(`${type} (Completed)`);
-                data.push(count);
-                backgroundColor.push(colors[type] || '#999');
-            });
-
-            // Add scheduled events
-            Object.entries(eventStats.scheduled).forEach(([type, count]) => {
-                labels.push(`${type} (Scheduled)`);
-                data.push(count);
-                backgroundColor.push(colors[type] || '#999');
-            });
+            // One cluster per event type on the x-axis; bars show completed vs scheduled
+            const types = [...new Set(events.map(e => e.type))];
+            const completedData = types.map(t => events.filter(e => e.type === t && e.date < today).length);
+            const scheduledData = types.map(t => events.filter(e => e.type === t && e.date >= today).length);
 
             // Create chart
             const ctx = document.getElementById('eventsChart').getContext('2d');
             new Chart(ctx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: backgroundColor,
-                        borderColor: '#fff',
-                        borderWidth: 2
-                    }]
+                    labels: types,
+                    datasets: [
+                        { label: 'Completed', data: completedData, backgroundColor: '#0066cc', borderRadius: 6 },
+                        { label: 'Not completed', data: scheduledData, backgroundColor: '#f0a500', borderRadius: 6 }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 12 },
-                                padding: 15,
-                                usePointStyle: true
-                            }
-                        }
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Event type' } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Events' } }
                     }
                 }
             });
