@@ -462,7 +462,8 @@ HTML_TEMPLATE = '''
         }
 
         .chart-container canvas {
-            max-width: 400px;
+            width: 100%;
+            max-width: 720px;
             margin: 0 auto;
             display: block;
         }
@@ -804,7 +805,7 @@ HTML_TEMPLATE = '''
                         legend: { position: 'bottom' }
                     },
                     scales: {
-                        x: { title: { display: true, text: 'Event type' } },
+                        x: { title: { display: true, text: 'Event type' }, ticks: { maxRotation: 0, autoSkip: false, font: { size: 12 } } },
                         y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Events' } }
                     }
                 }
