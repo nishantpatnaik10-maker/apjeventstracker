@@ -468,6 +468,52 @@ HTML_TEMPLATE = '''
             display: block;
         }
 
+        .upcoming-events-container {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .upcoming-events-container h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .upcoming-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .upcoming-table thead {
+            background: #667eea;
+        }
+
+        .upcoming-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+            border: 1px solid #ddd;
+        }
+
+        .upcoming-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .upcoming-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .upcoming-table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -564,6 +610,23 @@ HTML_TEMPLATE = '''
             <h2>📊 Events Analytics</h2>
             <canvas id="eventsChart"></canvas>
         </div>
+
+        <div class="upcoming-events-container">
+            <h2>📋 Upcoming Events</h2>
+            <table class="upcoming-table">
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Assignees</th>
+                        <th>Opportunity ID</th>
+                        <th>Travel Required</th>
+                    </tr>
+                </thead>
+                <tbody id="upcomingEventsBody">
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Event Details Modal -->
@@ -628,6 +691,7 @@ HTML_TEMPLATE = '''
                 document.getElementById('calendarTable').style.display = 'table';
                 renderCalendar();
                 setTimeout(generateChart, 100);
+                setTimeout(generateUpcomingEventsList, 100);
             } catch (error) {
                 console.error('Error loading events:', error);
                 document.getElementById('loadingMessage').innerHTML = '<span style="color: red;">Error loading events. Please make sure Google Sheets credentials are configured.</span>';
@@ -795,7 +859,7 @@ HTML_TEMPLATE = '''
                     labels: types,
                     datasets: [
                         { label: 'Completed', data: completedData, backgroundColor: '#0066cc', borderRadius: 6 },
-                        { label: 'Not completed', data: scheduledData, backgroundColor: '#f0a500', borderRadius: 6 }
+                        { label: 'Scheduled', data: scheduledData, backgroundColor: '#f0a500', borderRadius: 6 }
                     ]
                 },
                 options: {
@@ -809,6 +873,37 @@ HTML_TEMPLATE = '''
                         y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Events' } }
                     }
                 }
+            });
+        }
+
+        // Generate upcoming events list
+        function generateUpcomingEventsList() {
+            const today = new Date().toISOString().split('T')[0];
+            const upcomingEvents = events
+                .filter(e => e.date >= today)
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            const tbody = document.getElementById('upcomingEventsBody');
+            tbody.innerHTML = '';
+
+            if (upcomingEvents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No upcoming events</td></tr>';
+                return;
+            }
+
+            upcomingEvents.forEach(event => {
+                const row = document.createElement('tr');
+                const eventDate = new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                const travelRequired = event.travel_required === 'True' || event.travel_required === true ? '✓ Yes' : '✗ No';
+
+                row.innerHTML = `
+                    <td>${event.title}</td>
+                    <td>${eventDate}</td>
+                    <td>${event.assignees || 'Not assigned'}</td>
+                    <td>${event.sa_id || 'N/A'}</td>
+                    <td>${travelRequired}</td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
